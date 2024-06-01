@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center">TASKS</h2>
+    <div class="row">
+        {% for task in tasks %}
+            <div class="col-md-4 d-flex align-items-stretch">
+                <div class="card mb-4 w-100" data-toggle="modal" data-target="#taskModal{{ task.id }}">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ task.taskTitle }}</h5>
+                        <p class="card-text">{{ task.taskDescription|truncatewords:20 }}</p>
+                        <p class="card-text mt-auto"><small class="text-muted">Assigned on {{ task.task_assign_date }}</small></p>
+                        {% if task.is_completed %}
+                            <span class="badge badge-success">Completed</span>
+                        {% else %}
+                            <div class="mt-auto d-flex justify-content-center">
+                                <a href="{% url 'edit_task' task.id %}" class="btn btn-primary mx-1">Edit</a>
+                                <form method="post" action="{% url 'delete_task' task.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger mx-1">Delete</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="taskModal{{ task.id }}" tabindex="-1" role="dialog" aria-labelledby="taskModalLabel{{ task.id }}" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="taskModalLabel{{ task.id }}">{{ task.taskTitle }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>{{ task.taskDescription }}</p>
+                            <p>Assigned on: {{ task.task_assign_date }}</p>
+                        </div>
+                        <div class="modal-footer">
+                            {% if not task.is_completed %}
+                                <a href="{% url 'edit_task' task.id %}" class="btn btn-primary">Edit</a>
+                                <form method="post" action="{% url 'delete_task' task.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            {% else %}
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
